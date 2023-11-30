@@ -36,7 +36,7 @@ func wrapper(c *gin.Context) {
 			})
 			return
 		}
-		content, err := os.ReadFile("./prompt.txt")
+		prompt_content, err := os.ReadFile("./prompt.txt")
 	
 		if err != nil {
 			fmt.Println("can't not find prompt!",err);
@@ -45,7 +45,7 @@ func wrapper(c *gin.Context) {
 			})
 			return
 		}
-		prompt := string(content)
+		prompt := string(prompt_content)
 		chatData := chat.ChatRequest{
 			History: history,
 			Prompt:  prompt,
@@ -65,7 +65,7 @@ func wrapper(c *gin.Context) {
 	} else {
 		
 		fmt.Println("wrapper!!!!")
-		content, err := os.ReadFile("./prompt_wrapper.txt")
+		prompt_content, err := os.ReadFile("./prompt_wrapper.txt")
 	
 		if err != nil {
 			fmt.Println("can't not find prompt!",err);
@@ -74,7 +74,7 @@ func wrapper(c *gin.Context) {
 			})
 			return
 		}
-		prompt := string(content)
+		prompt := string(prompt_content)
 		if strings.Contains(req.Original_response[0], "查询到的作业内容") {
 			fmt.Println("作业！！")
 			fmt.Printf(req.Original_response[0])
