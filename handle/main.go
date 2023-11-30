@@ -6,7 +6,7 @@ import (
 	"handle/db"
 	"net/http"
 	"strings"
-
+	"os"
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,30 +21,41 @@ func wrapper(c *gin.Context) {
 	if err != nil {
 		fmt.Println("GetHistory err:", err)
 		c.JSON(http.StatusOK, gin.H{
-			"response": "卡洛看起来失踪了喵，可能是跑出去玩了!",
+			"response": []string{"卡洛看起来失踪了喵，可能是跑出去玩了!"},
 		})
 		return
 	}
 	fmt.Println("历史消息: ", history)
+
 	//db.GetAll()
 	if no_response { // 没有原始回复，直接聊天
 		if req.Message == "" {
 			fmt.Println("no Message and need chat")
 			c.JSON(http.StatusOK, gin.H{
-				"response": "卡洛不知道你在说什么喵",
+				"response": []string{"卡洛不知道你在说什么喵"},
 			})
 			return
 		}
+		content, err := os.ReadFile("./prompt.txt")
+	
+		if err != nil {
+			fmt.Println("can't not find prompt!",err);
+			c.JSON(http.StatusOK, gin.H{
+				"response": []string{"卡洛看起来失踪了喵，可能是跑出去玩了!"},
+			})
+			return
+		}
+		prompt := string(content)
 		chatData := chat.ChatRequest{
 			History: history,
-			Prompt:  "prompt_wrap.txt",
+			Prompt:  prompt,
 			Query:   req.User_name + "说:" + req.Message,
 		}
 		content, err := chatData.Chat()
 		if err != nil {
 			fmt.Println("chat err:", err)
 			c.JSON(http.StatusOK, gin.H{
-				"response": "卡洛看起来失踪了喵，可能是跑出去玩了!",
+				"response": []string{"卡洛看起来失踪了喵，可能是跑出去玩了!"},
 			})
 			return
 		}
@@ -52,20 +63,31 @@ func wrapper(c *gin.Context) {
 		db.InsertHisory(&req, content)
 		resp = append(resp, content)
 	} else {
+		
 		fmt.Println("wrapper!!!!")
+		content, err := os.ReadFile("./prompt_wrapper.txt")
+	
+		if err != nil {
+			fmt.Println("can't not find prompt!",err);
+			c.JSON(http.StatusOK, gin.H{
+				"response": []string{"卡洛看起来失踪了喵，可能是跑出去玩了!"},
+			})
+			return
+		}
+		prompt := string(content)
 		if strings.Contains(req.Original_response[0], "查询到的作业内容") {
 			fmt.Println("作业！！")
 			fmt.Printf(req.Original_response[0])
 			chatData := chat.ChatRequest{
 				History: nil,
-				Prompt:  "prompt_wrap.txt",
+				Prompt:  prompt,
 				Query:   "wrapper: 快去加油写作业！",
 			}
 			content, err := chatData.Chat()
 			if err != nil {
 				fmt.Println("chat err:", err)
 				c.JSON(http.StatusOK, gin.H{
-					"response": "卡洛看起来失踪了喵，可能是跑出去玩了!",
+					"response": []string{"卡洛看起来失踪了喵，可能是跑出去玩了!"},
 				})
 				return
 			}
@@ -77,14 +99,14 @@ func wrapper(c *gin.Context) {
 		}
 		chatData := chat.ChatRequest{
 			History: nil,
-			Prompt:  "prompt_wrap.txt",
+			Prompt:  prompt,
 			Query:   "wrapper: " + req.Original_response[0],
 		}
 		content, err := chatData.Chat()
 		if err != nil {
 			fmt.Println("chat err:", err)
 			c.JSON(http.StatusOK, gin.H{
-				"response": "卡洛看起来失踪了喵，可能是跑出去玩了!",
+				"response": []string{"卡洛看起来失踪了喵，可能是跑出去玩了!"},
 			})
 			return
 		}
@@ -104,5 +126,5 @@ func main() {
 	r := gin.Default()
 	r.POST("/wrapper", wrapper)
 	r.POST("/parser", parser)
-	r.Run("0.0.0.0:8284")
+	r.Run("0.0.0.0:8283")
 }

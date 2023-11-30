@@ -109,7 +109,8 @@ https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-ubuntu/
     查看状态
     sudo systemctl stop mongod
     关闭
-    sudo systemctl restart mongod
+    sudo systemctl r
+    estart mongod
     重启
     mongosh
     数据库命令行

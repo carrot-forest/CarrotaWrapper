@@ -33,7 +33,7 @@ func (data ChatRequest) Chat() (string, error) {
 		return "Requeset err", err
 	}
 	req.Header.Set("Content-Type", "application/json")
-	client := &http.Client{} //Timeout: 60 * time.Second}
+	client := &http.Client{} 
 	resp, err := client.Do(req)
 	if err != nil {
 		fmt.Println("Request do err:", err)
